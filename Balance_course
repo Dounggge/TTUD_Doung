@@ -1,0 +1,85 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int m, n; // m = teachers, n = subjects
+vector<unordered_set<int>> canTeach; // canTeach[t] = subjects teacher t can teach
+vector<vector<bool>> overlap; // overlap[i][j] = true -> subjects i and j overlap in schedule
+vector<int> teacherOf; // teacherOf[c] = teacher assigned -> sub c
+vector<int> load; // load[t] = teacher t's current load
+int bestLoad = INT_MAX;
+
+bool canAssign(int t, int c)
+{
+    if (!canTeach[t].count(c))
+        return false;
+    for (int k = 1; k <= n; ++k)
+        if (teacherOf[k] == t && overlap[k][c])
+            return false;
+    return true;
+}
+
+void assignCourse(int c, int t)
+{
+    teacherOf[c] = t;
+    load[t]++;
+}
+
+void unassignCourse(int c, int t)
+{
+    teacherOf[c] = 0;
+    load[t]--;
+}
+
+void backtrack(int c)
+{
+    if (c > n) {
+        int currentMax = *max_element(load.begin() + 1, load.end());
+        bestLoad = min(bestLoad, currentMax);
+        return;
+    }
+
+    for (int t = 1; t <= m; ++t) {
+        if (canAssign(t, c)) {
+            assignCourse(c, t);
+            int currentMax = *max_element(load.begin() + 1, load.end());
+            if (currentMax < bestLoad)
+                backtrack(c + 1);
+            unassignCourse(c, t);
+        }
+    }
+}
+
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    cin >> m >> n;
+    canTeach.assign(m + 1, {});
+    teacherOf.assign(n + 1, 0);
+    load.assign(m + 1, 0);
+    overlap.assign(n + 1, vector<bool>(n + 1, false));
+
+    // setup canTeach
+    for (int i = 1; i <= m; ++i) {
+        int k;
+        cin >> k;
+        while (k--) {
+            int c;
+            cin >> c;
+            canTeach[i].insert(c);
+        }
+    }
+
+    // setup overlap
+    int r;
+    cin >> r;
+    while (r--) {
+        int x, y;
+        cin >> x >> y;
+        overlap[x][y] = overlap[y][x] = true;
+    }
+
+    backtrack(1);
+    cout << (bestLoad == INT_MAX ? -1 : bestLoad);
+}
