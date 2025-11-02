@@ -1,0 +1,159 @@
+// inversions.cpp
+#include <bits/stdc++.h>
+using namespace std;
+long long merge_count(vector<long long>& a, int l, int r) {
+    if (l >= r) return 0;
+    int m = (l + r) / 2;
+    long long inv = 0;
+    inv += merge_count(a, l, m);
+    inv += merge_count(a, m + 1, r);
+
+    vector<long long> temp;
+    int i = l, j = m + 1;
+    while (i <= m && j <= r) {
+        if (a[i] <= a[j]) temp.push_back(a[i++]);
+        else {
+            temp.push_back(a[j++]);
+            inv += (m - i + 1); // các phần tử còn lại bên trái lớn hơn
+        }
+    }
+    while (i <= m) temp.push_back(a[i++]);
+    while (j <= r) temp.push_back(a[j++]);
+    for (int k = l; k <= r; ++k) a[k] = temp[k - l];
+    return inv;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int n;
+    cin >> n;
+    vector<long long> a(n);
+    for (int i = 0; i < n; ++i) cin >> a[i];
+    cout << merge_count(a, 0, n - 1) << '\n';
+}
+
+
+
+
+
+Giải phẫu từng phần
+1. #include <bits/stdc++.h>
+
+Một cú hack hợp pháp trong competitive programming.
+Nó import toàn bộ thư viện chuẩn của C++ (sort, vector, string, iostream, v.v).
+Thay vì gõ 10 dòng #include <vector> #include <iostream>, ta dùng một dòng duy nhất.
+
+2. using namespace std;
+
+Giúp bạn không phải viết std::vector hay std::cout nữa.
+Chỉ là tiện dụng, không có ma thuật gì.
+
+3. Hàm merge_count
+
+Đây là trung tâm của bài, nó vừa sắp xếp, vừa đếm nghịch thế.
+
+Dòng này:
+if (l >= r) return 0;
+
+
+Nếu mảng chỉ còn 1 phần tử (hoặc rỗng), không có cặp nghịch thế nào cả → trả về 0.
+
+Chia mảng ra hai nửa
+int m = (l + r) / 2;
+long long inv = 0;
+inv += merge_count(a, l, m);
+inv += merge_count(a, m + 1, r);
+
+
+m là chỉ số giữa.
+
+Gọi đệ quy merge_count cho nửa trái (l..m) và nửa phải (m+1..r).
+
+Mỗi lời gọi sẽ sắp xếp phần đó và trả về số nghịch thế trong phần đó.
+
+Tổng cộng lại thành inv.
+
+Bắt đầu “merge” (trộn hai nửa đã sắp xếp)
+vector<long long> temp;
+int i = l, j = m + 1;
+
+
+i chạy trong nửa trái, j chạy trong nửa phải.
+
+temp là mảng tạm để chứa kết quả đã trộn.
+
+Phần quan trọng nhất
+while (i <= m && j <= r) {
+    if (a[i] <= a[j]) temp.push_back(a[i++]);
+    else {
+        temp.push_back(a[j++]);
+        inv += (m - i + 1);
+    }
+}
+
+
+Đây chính là nơi “đếm nghịch thế” xảy ra.
+
+Nếu a[i] <= a[j]: ok, phần tử trái nhỏ hơn hoặc bằng, không có nghịch thế nào mới.
+→ đẩy a[i] vào temp, tăng i.
+
+Nếu a[i] > a[j]:
+có nghĩa là tất cả các phần tử từ a[i] đến a[m] đều > a[j]
+(vì hai nửa đều đã sắp xếp, nên mọi thứ sau a[i] còn lớn hơn nữa).
+→ Thêm (m - i + 1) vào inv.
+→ Đẩy a[j] vào temp, tăng j.
+
+Đó chính là đếm hàng loạt nghịch thế trong một cú.
+
+Sau khi một bên cạn, đổ nốt phần còn lại
+while (i <= m) temp.push_back(a[i++]);
+while (j <= r) temp.push_back(a[j++]);
+
+
+Đơn giản là copy phần còn lại của nửa nào chưa xong.
+
+Copy temp về lại mảng gốc
+for (int k = l; k <= r; ++k) a[k] = temp[k - l];
+
+
+Giờ a[l..r] đã được sắp xếp hoàn chỉnh.
+Quan trọng: nhờ bước này, khi quay lui đệ quy, mảng luôn “sorted” —
+giúp phần merge ở tầng trên hoạt động chính xác.
+
+Kết thúc
+return inv;
+
+
+Trả lại tổng số nghịch thế tìm thấy trong phạm vi [l..r].
+
+4. Hàm main
+
+Chỉ là phần chuẩn bị và gọi hàm chính thôi.
+
+Đọc n, đọc mảng a
+
+Gọi merge_count(a, 0, n-1)
+
+In ra kết quả.
+
+5. Minh họa logic
+
+Ví dụ:
+a = [2, 3, 8, 6, 1]
+
+Khi chia nhỏ và trộn, ở bước merge cuối:
+
+Left = [2, 3, 6, 8]
+Right = [1]
+
+
+Lúc so sánh 2 > 1 → cộng (4-0) = 4 nghịch thế.
+Tổng hợp toàn bộ các lần như vậy ra 5.
+
+6. Tổng kết
+Mục đích	Mô tả ngắn
+merge_count	Đệ quy chia mảng, đếm nghịch thế
+m - i + 1	Số phần tử bên trái còn lại lớn hơn phần tử phải
+temp	Mảng tạm để ghép hai nửa đã sắp xếp
+O(n log n)	Vì chia đôi và merge mỗi tầng mất O(n)
