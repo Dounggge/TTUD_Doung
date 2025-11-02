@@ -34,7 +34,7 @@ int main() {
 }
 
 
-
+---
 
 
 Giải phẫu từng phần
@@ -157,3 +157,27 @@ merge_count	Đệ quy chia mảng, đếm nghịch thế
 m - i + 1	Số phần tử bên trái còn lại lớn hơn phần tử phải
 temp	Mảng tạm để ghép hai nửa đã sắp xếp
 O(n log n)	Vì chia đôi và merge mỗi tầng mất O(n)
+
+
+---
+Cách 1: Duyệt đôi (Brute force)
+for i in 0..n-1:
+    for j in i+1..n-1:
+        nếu a[i] > a[j] thì tăng đếm
+
+
+Rõ ràng, đơn giản, O(n²).
+Chạy chậm thảm hại nếu n lớn (ví dụ 10⁵ phần tử là toang).
+
+Cách 2: Merge Sort + đếm trong lúc trộn (O(n log n))
+
+Khi trộn hai nửa đã sắp xếp:
+
+Nếu phần tử bên trái > phần tử bên phải,
+thì toàn bộ phần còn lại của nửa trái (từ vị trí đó trở đi) cũng > phần tử bên phải.
+
+Do đó ta có thể cộng luôn số phần tử đó vào biến đếm.
+
+Ý tưởng đơn giản đến mức chỉ cần nhớ 1 câu:
+
+“Khi merge, mỗi lần lấy phần tử bên phải, ta đếm xem còn bao nhiêu phần tử bên trái chưa được lấy.”
