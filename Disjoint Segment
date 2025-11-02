@@ -82,6 +82,7 @@ for (...) if (...) ++cnt;
 cout << cnt;
 
 
+---
 // disjoint_segments.cpp
 #include <bits/stdc++.h>
 using namespace std;
@@ -105,3 +106,19 @@ int main() {
     cout << cnt << '\n';
     return 0;
 }
+
+
+
+---
+Ý tưởng ngắn gọn
+
+Đọc danh sách đoạn (a_i, b_i) với a_i < b_i.
+
+Sắp xếp theo b_i tăng dần.
+
+Duyệt từ trái sang phải, giữ biến last_end = điểm kết thúc của đoạn vừa chọn (khởi tạo = −∞).
+
+Chọn đoạn hiện tại nếu a_i > last_end (ghi chú: nếu bạn muốn cho phép các đoạn chạm nhau ở đầu-cuối thì dùng a_i >= last_end).
+
+Đếm số đoạn đã chọn.
+Độ phức tạp: sắp xếp O(n log n) + duyệt O(n).
