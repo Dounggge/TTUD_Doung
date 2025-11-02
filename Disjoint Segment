@@ -1,0 +1,107 @@
+1. Cú pháp hình thức
+#include <bits/stdc++.h>
+using namespace std;
+
+
+Dòng đầu: gom toàn bộ thư viện chuẩn vào một file (đỡ include từng cái).
+
+Dòng thứ hai: khỏi phải gõ std:: mỗi lần. Thật ra chỉ là phép lười chính thức hóa.
+
+2. Đọc input
+ios::sync_with_stdio(false);
+cin.tie(nullptr);
+
+
+Hai dòng này chỉ để C++ đọc nhanh hơn.
+
+Nếu bạn bỏ đi, chương trình vẫn chạy, chỉ chậm hơn một chút.
+Nghĩa là:
+
+int n;
+cin >> n;
+
+
+giống hệt n = int(input()) trong Python.
+
+3. Lưu dữ liệu
+vector<pair<long long,long long>> seg(n);
+
+
+Đây là cách C++ nói “tôi có một danh sách n phần tử, mỗi phần tử là một cặp (a,b) kiểu số nguyên lớn”.
+Trong Python thì đơn giản là:
+
+segs = [(a,b), (c,d), ...]
+
+4. Sắp xếp
+sort(seg.begin(), seg.end(), [](auto &A, auto &B){ return A.second < B.second; });
+
+
+Lệnh này tương đương với:
+
+segments.sort(key=lambda x: x[1])
+
+
+Nhưng C++ phải chỉ rõ kiểu dữ liệu, phạm vi vùng nhớ, và một biểu thức lambda dài dòng — vì nó sinh ra để không tin ai cả, kể cả bạn.
+
+5. Thuật toán chính
+long long last = LLONG_MIN/4;
+int cnt = 0;
+for (auto &p : seg) {
+    if (p.first > last) {
+        ++cnt;
+        last = p.second;
+    }
+}
+
+
+Nó giống hệt Python:
+
+last = -10**18
+count = 0
+for s, e in segments:
+    if s > last:
+        count += 1
+        last = e
+
+
+Chỉ khác là C++ bắt bạn gõ dấu chấm phẩy như kiểu cảnh sát giao thông bắt đội mũ bảo hiểm.
+
+6. In ra kết quả
+cout << cnt << '\n';
+
+
+Tương đương print(count).
+Hết.
+
+7. Tổng thể
+
+Nếu bạn bỏ hết phần “lễ nghi”, C++ này về bản chất chỉ còn vài dòng:
+
+sort(seg.begin(), seg.end(), cmp);
+for (...) if (...) ++cnt;
+cout << cnt;
+
+
+// disjoint_segments.cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    int n;
+    if (!(cin >> n)) return 0;
+    vector<pair<long long,long long>> seg(n);
+    for (int i = 0; i < n; ++i) cin >> seg[i].first >> seg[i].second;
+    sort(seg.begin(), seg.end(), [](auto &A, auto &B){ return A.second < B.second; });
+    long long last = LLONG_MIN/4;
+    int cnt = 0;
+    for (auto &p : seg) {
+        if (p.first > last) {
+            ++cnt;
+            last = p.second;
+        }
+    }
+    cout << cnt << '\n';
+    return 0;
+}
