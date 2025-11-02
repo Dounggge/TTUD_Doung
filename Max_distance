@@ -1,0 +1,126 @@
+2. Ý tưởng
+Bước 1 – Sắp xếp dãy
+
+Cho dễ tính khoảng cách.
+
+Bước 2 – Kiểm tra một khoảng cách d có hợp không
+
+Dùng tham lam:
+
+Chọn phần tử đầu tiên (a[0]).
+
+Với từng a[i], nếu a[i] - last ≥ d, chọn nó vào dãy con.
+
+Đếm xem chọn được bao nhiêu phần tử.
+
+Nếu đếm được ≥ C, tức là có thể đạt khoảng cách d.
+
+Bước 3 – Tìm kiếm nhị phân
+
+Thay vì thử tất cả d từ lớn đến nhỏ (O(n²)), ta dùng binary search trên d:
+
+Giới hạn: left = 1, right = a[n-1] - a[0].
+
+Mỗi lần lấy mid, kiểm tra có được không.
+
+Nếu có → thử lớn hơn (left = mid + 1).
+
+Nếu không → thử nhỏ hơn (right = mid - 1).
+
+Kết quả cuối cùng: right (giá trị lớn nhất còn hợp lệ).
+
+
+
+
+---
+#include <bits/stdc++.h>
+using namespace std;
+
+bool can_place(vector<long long>& a, int c, long long dist) {
+    long long last = a[0];
+    int count = 1; // đã chọn phần tử đầu tiên
+    for (int i = 1; i < (int)a.size(); i++) {
+        if (a[i] - last >= dist) {
+            count++;
+            last = a[i];
+        }
+    }
+    return count >= c;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, c;
+    cin >> n >> c;
+    vector<long long> a(n);
+    for (int i = 0; i < n; i++) cin >> a[i];
+    sort(a.begin(), a.end());
+
+    long long left = 1, right = a.back() - a.front();
+    long long best = 0;
+
+    while (left <= right) {
+        long long mid = (left + right) / 2;
+        if (can_place(a, c, mid)) {
+            best = mid;      // đạt được => thử lớn hơn
+            left = mid + 1;
+        } else {
+            right = mid - 1; // không đạt => giảm d
+        }
+    }
+
+    cout << best << "\n";
+}
+---
+5. Giải thích C++ dễ hiểu
+can_place(...)
+
+Đây là thuật toán tham lam thật sự.
+Ý tưởng: “Đặt phần tử càng sớm càng tốt, miễn sao khoảng cách ≥ d”.
+
+Ví dụ d = 3, a = [1, 2, 4, 8, 9], C = 3:
+
+Chọn 1
+
+Bỏ 2 (2−1=1<3)
+
+Chọn 4 (4−1=3≥3)
+
+Bỏ 8 (8−4=4≥3 → chọn luôn)
+→ đủ 3 phần tử, OK.
+
+while (left <= right)
+
+Đây là phần binary search:
+
+Giữa left và right, chọn mid làm khoảng cách thử nghiệm.
+
+Nếu sắp được đủ C phần tử (tức là có thể đặt với d=mid), ta “tham lam” muốn hơn nữa → left = mid + 1.
+
+Nếu không, ta thu nhỏ lại → right = mid - 1.
+
+Khi vòng lặp kết thúc, best giữ giá trị lớn nhất đạt được.
+
+Tổng quan độ phức tạp
+Bước	Độ phức tạp
+Sắp xếp	O(n log n)
+Kiểm tra (mỗi mid)	O(n)
+Binary search	O(log (max-min))
+Tổng	O(n log n) (vì log khoảng giá trị thường tương đương log n)
+6. Kết luận cho bạn học
+Thành phần	Loại	Ý nghĩa
+sort()	Chuẩn bị	Đảm bảo dãy tăng
+can_place()	Tham lam	Chọn phần tử hợp lệ nhất
+while (left <= right)	Tìm kiếm nhị phân	Tối ưu hóa giá trị khoảng cách
+Kết quả	best	Khoảng cách lớn nhất có thể đạt được
+
+Cái hay ở đây là:
+
+“Tham lam” dùng trong mỗi lần kiểm tra.
+
+“Nhị phân” dùng ngoài để tối ưu.
+Hai thứ phối hợp như một cặp kiếm sĩ: một người đâm, một người né, kết hợp thì tốc độ khủng.
+
+Độ phức tạp: O(n log (a[n-1] - a[0])) — rất nhanh.
